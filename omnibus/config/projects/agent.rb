@@ -115,9 +115,6 @@ dependency 'cacerts'
 # creates required build directories
 dependency 'datadog-agent-prepare'
 
-# Datadog agent
-dependency 'datadog-agent'
-
 # Additional software
 dependency 'datadog-pip'
 dependency 'datadog-agent-integrations'
@@ -130,6 +127,10 @@ dependency 'datadog-process-agent' # Includes network-tracer
 if osx?
   dependency 'datadog-agent-mac-app'
 end
+
+# Datadog agent, keep it last to
+# speed up repeated builds
+dependency 'datadog-agent'
 
 # Remove pyc/pyo files from package
 # should be built after all the other python-related software defs

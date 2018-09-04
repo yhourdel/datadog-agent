@@ -16,7 +16,9 @@ end
 license "Apache-2.0"
 license_file "../LICENSE"
 
-source path: '..'
+source path: '..',
+       # Ignore folders holding big unused artifacts to speed up the copy
+       options: { exclude: ['bin', 'omnibus/pkg', 'Dockerfiles'] }
 relative_path 'src/github.com/DataDog/datadog-agent'
 
 build do
