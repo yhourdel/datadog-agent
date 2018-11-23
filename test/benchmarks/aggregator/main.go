@@ -120,7 +120,7 @@ func getExpvarJSON() (*aggregatorStats, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 
 	res := stats{}
 	err = json.Unmarshal(body, &res)

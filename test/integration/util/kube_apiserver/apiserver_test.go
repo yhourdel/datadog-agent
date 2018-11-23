@@ -149,7 +149,7 @@ func (suite *testSuite) TestKubeEvents() {
 	assert.EqualValues(suite.T(), modified[0].InvolvedObject.UID, modified[1].InvolvedObject.UID)
 
 	// We should get nothing new now
-	added, modified, resversion, err = suite.apiClient.LatestEvents(resversion, eventReadTimeout)
+	added, modified, _, err = suite.apiClient.LatestEvents(resversion, eventReadTimeout)
 	require.NoError(suite.T(), err)
 	assert.Len(suite.T(), added, 0)
 	assert.Len(suite.T(), modified, 0)
@@ -184,6 +184,7 @@ func (suite *testSuite) TestHostnameProvider() {
 
 	// Hostname provider should return the expected value
 	foundHost, err := apiserver.HostnameProvider("")
+	require.NoError(suite.T(), err)
 	assert.Equal(suite.T(), "target.host", foundHost)
 
 	// Testing hostname when a cluster name is set
@@ -194,5 +195,6 @@ func (suite *testSuite) TestHostnameProvider() {
 	defer clustername.ResetClusterName()
 
 	foundHost, err = apiserver.HostnameProvider("")
+	require.NoError(suite.T(), err)
 	assert.Equal(suite.T(), "target.host-Laika", foundHost)
 }
