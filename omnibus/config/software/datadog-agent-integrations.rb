@@ -8,6 +8,8 @@ require 'json'
 
 name 'datadog-agent-integrations'
 
+dependency 'datadog-pip'
+
 if linux?
   # add nfsiostat script
   dependency 'nfsiostat'

@@ -119,20 +119,20 @@ dependency 'datadog-agent-prepare'
 dependency 'datadog-pip'
 dependency 'jmxfetch'
 
+# Integrations-core
+dependency 'datadog-agent-integrations'
+
 # External agents
 dependency 'datadog-trace-agent'
 dependency 'datadog-process-agent' # Includes network-tracer
 
-# Integrations-core
-dependency 'datadog-agent-integrations'
+# Datadog agent, keep it last to
+# speed up repeated builds
+dependency 'datadog-agent'
 
 if osx?
   dependency 'datadog-agent-mac-app'
 end
-
-# Datadog agent, keep it last to
-# speed up repeated builds
-dependency 'datadog-agent'
 
 # Remove pyc/pyo files from package
 # should be built after all the other python-related software defs
