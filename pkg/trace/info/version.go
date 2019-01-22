@@ -33,7 +33,7 @@ func VersionString() string {
 		fmt.Fprintf(&buf, "Build date: %s\n", BuildDate)
 	}
 	if GoVersion != "" {
-		fmt.Fprintf(&buf, "Go Version: %s\n", GoVersion)
+		fmt.Fprintf(&buf, "Go version: %s\n", GoVersion)
 	}
 
 	return buf.String()
