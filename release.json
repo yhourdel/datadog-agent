@@ -8,7 +8,7 @@
 		"JMXFETCH_VERSION": "0.25.0",
 		"JMXFETCH_HASH": "e653086523c93faf8a0b189a0e3aa2cd5f21d5bc6bbd19c279372dbdc6972dea"
 	},
-	"6.10.0-spf-rc.3": {
+	"6.10.0-spf-rc.4": {
 		"INTEGRATIONS_CORE_VERSION": "ofek/spf",
 		"TRACE_AGENT_VERSION": "master",
 		"PROCESS_AGENT_VERSION": "master",
