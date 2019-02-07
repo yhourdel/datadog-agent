@@ -72,6 +72,7 @@ func (c *Config) String() string {
 	rawConfig := make(map[interface{}]interface{})
 	var initConfig interface{}
 	var instances []interface{}
+	var logsConfig interface{}
 
 	rawConfig["check_name"] = c.Name
 
@@ -84,6 +85,9 @@ func (c *Config) String() string {
 		instances = append(instances, instance)
 	}
 	rawConfig["instances"] = instances
+
+	yaml.Unmarshal(c.LogsConfig, &logsConfig)
+	rawConfig["logs_config"] = logsConfig
 
 	buffer, err := yaml.Marshal(&rawConfig)
 	if err != nil {
