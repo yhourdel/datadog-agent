@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/DataDog/datadog-agent/pkg/config"
-	log "github.com/cihub/seelog"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 )
 
 func applyEnv() {

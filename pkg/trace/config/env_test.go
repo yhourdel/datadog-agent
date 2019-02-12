@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/DataDog/datadog-agent/pkg/config"
-	log "github.com/cihub/seelog"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"github.com/stretchr/testify/assert"
 )
 

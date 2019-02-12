@@ -7,10 +7,11 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"strings"
 	"time"
 
-	log "github.com/cihub/seelog"
+	"github.com/DataDog/datadog-agent/cmd/agent/common"
+	coreconfig "github.com/DataDog/datadog-agent/pkg/config"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 
 	"github.com/DataDog/datadog-agent/pkg/pidfile"
 	"github.com/DataDog/datadog-agent/pkg/trace/config"
@@ -29,14 +30,32 @@ Exiting.`
 
 // Run is the entrypoint of our code, which starts the agent.
 func Run(ctx context.Context) {
-	// configure a default logger before anything so we can observe initialization
-	if flags.Info || flags.Version {
-		log.UseLogger(log.Disabled)
-	} else {
-		SetupDefaultLogger()
-		defer log.Flush()
+	// Global Agent configuration
+	err := common.SetupConfig(flags.ConfigPath)
+	if err != nil {
+		log.Errorf("Failed to setup config %v", err)
 	}
 
+	// configure a default logger before anything so we can observe initialization
+	syslogURI := coreconfig.GetSyslogURI()
+	logFile := coreconfig.Datadog.GetString("log_file")
+	if logFile == "" {
+		logFile = common.DefaultLogFile
+	}
+
+	if coreconfig.Datadog.GetBool("disable_file_logging") {
+		// this will prevent any logging on file
+		logFile = ""
+	}
+
+	err = coreconfig.SetupLogger(
+		coreconfig.Datadog.GetString("log_level"),
+		logFile,
+		syslogURI,
+		coreconfig.Datadog.GetBool("syslog_rfc"),
+		coreconfig.Datadog.GetBool("log_to_console"),
+		coreconfig.Datadog.GetBool("log_format_json"),
+	)
 	defer watchdog.LogOnPanic()
 
 	// start CPU profiling
@@ -95,28 +114,6 @@ func Run(ctx context.Context) {
 		// http://supervisord.org/subprocess.html#process-states
 		time.Sleep(5 * time.Second)
 		return
-	}
-
-	// Initialize logging (replacing the default logger). No need
-	// to defer log.Flush, it was already done when calling
-	// "SetupDefaultLogger" earlier.
-	cfgLogLevel := strings.ToLower(cfg.LogLevel)
-	if cfgLogLevel == "warning" {
-		// to match core agent:
-		// https://github.com/DataDog/datadog-agent/blob/6f2d901aeb19f0c0a4e09f149c7cc5a084d2f708/pkg/config/log.go#L74-L76
-		cfgLogLevel = "warn"
-	}
-	logLevel, ok := log.LogLevelFromString(cfgLogLevel)
-	if !ok {
-		logLevel = log.InfoLvl
-	}
-	duration := 10 * time.Second
-	if !cfg.LogThrottlingEnabled {
-		duration = 0
-	}
-	err = SetupLogger(logLevel, cfg.LogFilePath, duration, 10)
-	if err != nil {
-		osutil.Exitf("cannot create logger: %v", err)
 	}
 
 	// Initialize dogstatsd client

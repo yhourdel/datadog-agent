@@ -3,7 +3,7 @@
 package watchdog
 
 import (
-	log "github.com/cihub/seelog"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 	"github.com/shirou/gopsutil/net"
 	"os"
 	"time"
