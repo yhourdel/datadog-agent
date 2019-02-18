@@ -6,6 +6,7 @@
 package config
 
 import (
+	"encoding/json"
 	"io"
 	"strings"
 	"sync"
@@ -114,6 +115,26 @@ func (c *safeConfig) GetDuration(key string) time.Duration {
 func (c *safeConfig) GetStringSlice(key string) []string {
 	c.RLock()
 	defer c.RUnlock()
+	return c.getStringSlice(key)
+}
+
+// getStringSlice returns the value associated with the key as a slice of
+// strings. If a string is mapped to this key, it first tries to parse the value
+// as JSON encoded data. If unsuccessful or in any other case, it will just use
+// viper's adequate helper for this type. This is for the sake of consistency
+// with the behaviour of maps, that do accept JSON as a value.
+// FIXME: Ideally, this should be removed and directly supported by spf13/cast
+// instead, but this is not the case yet.
+func (c *safeConfig) getStringSlice(key string) []string {
+	v := c.Viper.Get(key)
+
+	if s, ok := v.(string); ok {
+		var slice []string
+		if err := json.Unmarshal([]byte(s), &slice); err == nil {
+			return slice
+		}
+	}
+
 	return c.Viper.GetStringSlice(key)
 }
 

@@ -88,3 +88,15 @@ func TestGetConfigEnvVars(t *testing.T) {
 	config.BindEnv("config_option", "DD_CONFIG_OPTION")
 	assert.NotContains(t, config.GetEnvVars(), "DD_CONFIG_OPTION")
 }
+
+func TestGetStringSlice(t *testing.T) {
+	config := safeConfig{
+		Viper: viper.New(),
+	}
+
+	config.Set("ac_include", `["image:nginx", "image:redis"]`)
+	assert.Equal(t, []string{"image:nginx", "image:redis"}, config.GetStringSlice("ac_include"))
+
+	config.Set("ac_include", `image:nginx image:redis`)
+	assert.Equal(t, []string{"image:nginx", "image:redis"}, config.GetStringSlice("ac_include"))
+}
