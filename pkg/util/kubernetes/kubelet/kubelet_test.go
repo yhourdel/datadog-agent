@@ -703,6 +703,7 @@ func (suite *KubeletTestSuite) TestKubeletInitHttp() {
 
 func TestKubeletTestSuite(t *testing.T) {
 	config.SetupLogger(
+		config.LoggerName("test"),
 		"trace",
 		"",
 		"",

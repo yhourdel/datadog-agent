@@ -119,6 +119,7 @@ func start(cmd *cobra.Command, args []string) error {
 	}
 
 	err := config.SetupLogger(
+		config.DogstatsdLogger,
 		config.Datadog.GetString("log_level"),
 		logFile,
 		syslogURI,

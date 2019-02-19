@@ -115,6 +115,7 @@ func start(cmd *cobra.Command, args []string) error {
 	defer mainCtxCancel() // Calling cancel twice is safe
 
 	err = config.SetupLogger(
+		config.DCALogger,
 		config.Datadog.GetString("log_level"),
 		logFile,
 		syslogURI,

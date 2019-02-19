@@ -144,7 +144,7 @@ func setupAgent() error {
 }
 
 func runJmxCommand(command string) error {
-	err := config.SetupLogger(jmxLogLevel, "", "", false, true, false)
+	err := config.SetupLogger(config.CoreLogger, jmxLogLevel, "", "", false, true, false)
 	if err != nil {
 		fmt.Printf("Cannot setup logger, exiting: %v\n", err)
 		return err

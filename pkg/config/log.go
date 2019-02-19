@@ -20,8 +20,19 @@ import (
 	"github.com/cihub/seelog"
 )
 
+// LoggerName is a string prepended to all logs to indicate which component is logging
+type LoggerName string
+
 const logFileMaxSize = 10 * 1024 * 1024         // 10MB
 const logDateFormat = "2006-01-02 15:04:05 MST" // see time.Format for format syntax
+// CoreLogger is the name of the core agent logger
+const CoreLogger LoggerName = "CORE"
+
+// DCALogger is the name of the cluster agent logger
+const DCALogger LoggerName = "DCA"
+
+// DogstatsdLogger is the name of the dogstatsd logger
+const DogstatsdLogger LoggerName = "DSD"
 
 var syslogTLSConfig *tls.Config
 
@@ -49,7 +60,7 @@ func getSyslogTLSKeyPair() (*tls.Certificate, error) {
 }
 
 // SetupLogger sets up the default logger
-func SetupLogger(logLevel, logFile, uri string, rfc, logToConsole, jsonFormat bool) error {
+func SetupLogger(loggerName LoggerName, logLevel, logFile, uri string, rfc, logToConsole, jsonFormat bool) error {
 	var syslog bool
 	var useTLS bool
 
@@ -107,12 +118,19 @@ func SetupLogger(logLevel, logFile, uri string, rfc, logToConsole, jsonFormat bo
 
 	configTemplate += fmt.Sprintf(`</outputs>
 	<formats>
-		<format id="json" format="{&quot;time&quot;:&quot;%%Date(%s)&quot;,&quot;level&quot;:&quot;%%LEVEL&quot;,&quot;file&quot;:&quot;%%ShortFilePath&quot;,&quot;line&quot;:&quot;%%Line&quot;,&quot;func&quot;:&quot;%%FuncShort&quot;,&quot;msg&quot;:&quot;%%Msg&quot;}%%n"/>
-		<format id="common" format="%%Date(%s) | %%LEVEL | (%%ShortFilePath:%%Line in %%FuncShort) | %%Msg%%n"/>
-		<format id="syslog-json" format="%%CustomSyslogHeader(20,`+strconv.FormatBool(rfc)+`){&quot;level&quot;:&quot;%%LEVEL&quot;,&quot;relfile&quot;:&quot;%%ShortFilePath&quot;,&quot;line&quot;:&quot;%%Line&quot;,&quot;msg&quot;:&quot;%%Msg&quot;}%%n"/>
-		<format id="syslog-common" format="%%CustomSyslogHeader(20,`+strconv.FormatBool(rfc)+`) %%LEVEL | (%%ShortFilePath:%%Line in %%FuncShort) | %%Msg%%n" />
+		<format id="json" format="{&quot;agent&quot;:&quot;%s&quot;,&quot;time&quot;:&quot;%%Date(%s)&quot;,&quot;level&quot;:&quot;%%LEVEL&quot;,&quot;file&quot;:&quot;%%ShortFilePath&quot;,&quot;line&quot;:&quot;%%Line&quot;,&quot;func&quot;:&quot;%%FuncShort&quot;,&quot;msg&quot;:&quot;%%Msg&quot;}%%n"/>
+		<format id="common" format="%%Date(%s) | %s | %%LEVEL | (%%ShortFilePath:%%Line in %%FuncShort) | %%Msg%%n"/>
+		<format id="syslog-json" format="%%CustomSyslogHeader(20,`+strconv.FormatBool(rfc)+`){&quot;agent&quot;:&quot;%s&quot;,&quot;level&quot;:&quot;%%LEVEL&quot;,&quot;relfile&quot;:&quot;%%ShortFilePath&quot;,&quot;line&quot;:&quot;%%Line&quot;,&quot;msg&quot;:&quot;%%Msg&quot;}%%n"/>
+		<format id="syslog-common" format="%%CustomSyslogHeader(20,`+strconv.FormatBool(rfc)+`) %s | %%LEVEL | (%%ShortFilePath:%%Line in %%FuncShort) | %%Msg%%n" />
 	</formats>
-</seelog>`, logDateFormat, logDateFormat)
+</seelog>`,
+		strings.ToLower(string(loggerName)),
+		logDateFormat,
+		logDateFormat,
+		loggerName,
+		strings.ToLower(string(loggerName)),
+		loggerName,
+	)
 
 	logger, err := seelog.LoggerFromConfigAsString(configTemplate)
 	if err != nil {
